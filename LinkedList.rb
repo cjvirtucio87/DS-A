@@ -49,7 +49,7 @@ class List
   def deleteLink(start,target)
     p = Link.new(nil)
     p.next = start
-    while p.next.next != target
+    while (p.next.next != target) && (p.next.next.next)
       p.next = p.next.next
     end
     link = p.next
@@ -64,6 +64,25 @@ class List
       return nil if p.next.next == nil
       p.next = p.next.next
       i += 1
+    end
+    p.next
+  end
+
+  def findLastLesser(value)
+    p = Link.new(nil)
+    p.next = @head
+    while p.next.data < value
+      return 'END OF LIST' if p.next.next == nil
+      p.next = p.next.next
+    end
+    p.next
+  end
+
+  def findEnd
+    p = Link.new(nil)
+    p.next = @head
+    while p.next.next
+      p.next = p.next.next
     end
     p.next
   end
@@ -119,6 +138,39 @@ def findToTheLast (k, list)
     return link if p.next.next == nil
   end
 end
+
+#Partition method
+def partition(list,value)
+  list.eachLink do |link|
+    if link.data < value
+      lessThanValue(list,link)
+    elsif link.data > value
+      greaterThanValue(list,link,value) 
+    else
+      equalsValue(list,link) 
+    end
+  end
+  list
+end
+
+def lessThanValue(list,link)
+  list.deleteLink(list.head,link)
+  list.insertHead(link)
+end
+
+def greaterThanValue(list,link,value)
+  lastLesser = list.findLastLesser value
+  link.next = lastLesser.next
+  lastLesser.next = link
+end
+
+def equalsValue(list,link)
+  endOfList = list.findEnd
+  endOfList.next = link
+  link.next = nil
+end
+
+
 
 def testLink(input)
   link = Link.new(input)
@@ -189,11 +241,53 @@ def testLink(input)
 
   #Traversal check
   traversalCheck = !!new_new_list.traverse(new_new_list.head,4)
-  puts new_new_list.traverse(new_new_list.head,2).data
 
   #Find kth to the last check
   toTheLastCheck = findToTheLast(2,new_new_list) == \
                    new_new_list.traverse(new_new_list.head,2)
+
+  partition_list = List.new(Link.new 5)
+  5.times do
+    partition_list.insertHead Link.new(rand 10)
+  end
+  partition_list.insertHead Link.new 3
+  4.times do
+    partition_list.insertHead Link.new rand 10
+  end
+
+  # partition_list.eachLink do |link|
+  #   p link.data
+  # end
+
+  #Test less than five.
+  lessThanFiveCheck = lambda do 
+    link = Link.new 3
+    lessThanValue(partition_list,link)
+    partition_list.head.data < 5
+  end
+
+  #Test greater than five
+  greaterThanFiveCheck = lambda do
+    link = Link.new 8
+    greaterThanValue(partition_list,link,5)
+    partition_list.findLastLesser(5).next.data == 8
+  end
+
+  #Test if equals five
+  equalsFiveCheck = lambda do
+    link = Link.new 5
+    equalsValue(partition_list,link)
+    partition_list.findEnd.data == 5
+  end
+
+
+  ### PARTITION METHOD NEEDS WORK
+  #Test partition
+  # partition_testGreater = lambda do
+  #   partition(partition_list,5)
+  #   partition_list.findLastLesser(5).next.data > 5
+  # end
+
 
   #Tests.
   return dataCheck && \
@@ -207,8 +301,11 @@ def testLink(input)
          deleteCheck && \
          dupCheckAll.() && \
          traversalCheck && \
-         toTheLastCheck
-
+         toTheLastCheck && \
+         lessThanFiveCheck.() && \
+         greaterThanFiveCheck.() && \
+         equalsFiveCheck.() \
+         # partition_testGreater.()
 end
 
 
