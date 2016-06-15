@@ -40,7 +40,7 @@ class List
   def eachLink
     p = Link.new(nil)
     p.next = @head
-    while (p.next != nil) && (p.next.next != nil) 
+    while (p.next != nil) 
       yield p.next
       p.next = p.next.next
     end
@@ -100,7 +100,7 @@ class Link
   def findDup
     p = Link.new(nil)
     p.next = self.next
-    while p.next.next != nil
+    while p.next != nil
       return p.next if self.data == p.next.data
       p.next = p.next.next
     end
@@ -170,6 +170,18 @@ def equalsValue(list,link)
   link.next = nil
 end
 
+#sum lists
+def sumLists (a,b)
+  string_a = ''
+  string_b = ''
+  a.eachLink do |link|
+    string_a = string_a + link.data.to_s
+  end
+  b.eachLink do |link|
+    string_b = string_b + link.data.to_s
+  end
+  string_a.to_i + string_b.to_i
+end
 
 
 def testLink(input)
@@ -288,6 +300,20 @@ def testLink(input)
   #   partition_list.findLastLesser(5).next.data > 5
   # end
 
+  #Sum lists test
+  sumListsCheck = lambda do
+    list_a = List.new(Link.new 2)
+    2.times do
+      list_a.insertHead Link.new 2
+    end
+
+    list_b = List.new(Link.new 3)
+    2.times do
+      list_b.insertHead(Link.new 3)
+    end
+
+    (sumLists list_a, list_b) == 555
+  end
 
   #Tests.
   return dataCheck && \
@@ -304,8 +330,9 @@ def testLink(input)
          toTheLastCheck && \
          lessThanFiveCheck.() && \
          greaterThanFiveCheck.() && \
-         equalsFiveCheck.() \
+         equalsFiveCheck.() && \
          # partition_testGreater.()
+         sumListsCheck.()
 end
 
 
