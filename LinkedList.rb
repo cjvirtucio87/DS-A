@@ -87,6 +87,48 @@ class List
     p.next
   end
 
+  def increment_p1(n=1)
+    n.times do 
+      return 'END OF LIST' if @p1.next.next == nil
+      @p1.next = @p1.next.next
+    end
+  end
+
+  def increment_p2(n=1)
+    n.times do
+      return 'END OF LIST' if @p2.next.next == nil
+      @p2.next = @p2.next.next
+    end
+  end
+
+  def decrement_p1(n=1)
+    n.times do
+      return 'START OF LIST' if @p1.next == @head
+      @p1.next = getPrev(@p1.next)
+    end
+  end
+
+  def decrement_p2(n=1)
+    n.times do
+      return 'START OF LIST' if @p2.next == @head
+      @p2.next = getPrev(@p2.next)
+    end
+  end
+
+  def reset_pointers
+    @p1.next = @head
+    @p2.next = @head
+  end
+
+  def getPrev(link)
+    p = Link.new(nil)
+    p.next = @head
+    while p.next.next != link
+      p.next = p.next.next
+    end
+    return p.next
+  end
+
 end
 
 class Link
@@ -181,6 +223,20 @@ def sumLists (a,b)
     string_b = string_b + link.data.to_s
   end
   string_a.to_i + string_b.to_i
+end
+
+#palindromeCheck
+def palindrome?(list)
+  list.increment_p2 until list.p2.next.next == nil
+  len = list.getLength
+  i = 0
+  while i < len
+    return false if list.p1.next.data != list.p2.next.data
+    list.increment_p1
+    list.decrement_p2
+    i += 1
+  end
+  return true
 end
 
 
@@ -315,6 +371,13 @@ def testLink(input)
     (sumLists list_a, list_b) == 555
   end
 
+  #Palindrome test
+  palindromeCheck = lambda do
+    list = List.new(Link.new('a'))
+    %w(a b b a a).each { |e| list.insertHead Link.new(e) }
+    palindrome? list
+  end
+
   #Tests.
   return dataCheck && \
          nilCheck && \
@@ -332,8 +395,8 @@ def testLink(input)
          greaterThanFiveCheck.() && \
          equalsFiveCheck.() && \
          # partition_testGreater.()
-         sumListsCheck.()
+         sumListsCheck.() && \
+         palindromeCheck.()
 end
-
 
 puts testLink(500)
